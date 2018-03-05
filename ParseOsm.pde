@@ -4,7 +4,7 @@ You can get OSM files from https://www.openstreetmap.org  just click "export"
 */
 
 XML xml;
-float s = .25;
+float s = .02;
 float px,py;
 boolean hide = true;
 HashMap<String,Node> nodeMap;
@@ -14,9 +14,6 @@ ArrayList<Way> wayList;
 void setup() {
   size(1000, 800);
   //loadFile("elgin-map.osm");
-  //loadFile("rochester.osm");
-  //loadFile("champlin.osm");
-  //loadFile("redwing.osm");
   loadFile("belleview.osm");
   surface.setResizable(true);
 }
