@@ -13,8 +13,8 @@ ArrayList<Way> wayList;
 
 void setup() {
   size(1000, 800);
-  //loadFile("elgin-map.osm");
-  loadFile("belleview.osm");
+  loadFile("elgin-map.osm"); s=.22; px=4600; py=-1300;
+  //loadFile("belleview.osm");
   surface.setResizable(true);
 }
 
@@ -31,6 +31,7 @@ void keyTyped() {
     case 'z': s /= 1.5; break;
     case 'c': hide = !hide; break;
   }
+  println("s "+s+" p "+px+", "+py);
 }
 
 
@@ -45,12 +46,12 @@ void draw() {
   // DRAW ALL THE ROADS
   for (Way w: wayList) {
     Node p = null;
-    strokeWeight(1);  
+    strokeWeight(2);  
     if (w.highway == null) { stroke(100,255,100); if (hide) continue; }
     else if ("cycleway".equals(w.highway)) {stroke(255,255,50);if (hide) continue; }
     else if ("construction".equals(w.highway) || "service".equals(w.highway) || "proposed".equals(w.highway)) {stroke(50,255,255);if (hide) continue; }
     else if ("footway".equals(w.highway) || "steps".equals(w.highway) || "path".equals(w.highway)) {stroke(255,50,255);if (hide) continue; }
-    else { stroke(130);   strokeWeight(11);  }
+    else { stroke(120);   strokeWeight(11);  }
     for (Node n: w.nodeList) {
       if (p != null) 
         line(p.x, p.y, n.x, n.y);
@@ -60,7 +61,7 @@ void draw() {
   
   // DRAW ALL THE NODES
   if (!hide) {
-    fill(100);
+    fill(0);
     noStroke();
     for (String id: nodeMap.keySet()) {
       Node n = nodeMap.get(id);
