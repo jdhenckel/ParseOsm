@@ -4,6 +4,7 @@ class RoadType {
   color c;
   int cc;
   int numway;
+  int numnode;
   boolean show;
   int w;
   int y;
@@ -20,6 +21,6 @@ class RoadType {
   }
   
   void reset() {
-    numway = 0;
+    numway = 0; numnode=0;
   }
 }

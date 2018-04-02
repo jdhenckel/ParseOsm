@@ -64,7 +64,7 @@ void reduce() {
     for (int i=1; i < w.nodeList.size()-1; ++i) {
       Node n = w.nodeList.get(i);
       if (n.numway == 2) {
-        float h = n.heron(w.nodeList.get(i-1), w.nodeList.get(i+1));
+        float h = n.heron4area2(w.nodeList.get(i-1), w.nodeList.get(i+1));
         if (bestw == null || h < best) {
           best = h;
           besti = i;
@@ -74,14 +74,14 @@ void reduce() {
     }
   }
   if (bestw != null) {
-    println("removed node "+besti+" with area "+best);
+    println("removed node "+besti+" with area "+.25*Math.sqrt(best));
     bestw.nodeList.remove(besti);
   }  
 }
 
-boolean same(String s, String p) {
-  if (s==null) return p==null;
-  return s.equals(p);
+boolean same(String q, String p) {
+  if (q==null) return p==null;
+  return q.equals(p);
 }
 
 void writeFile() {
@@ -125,6 +125,7 @@ void draw() {
     Node p = null;
     RoadType rt = rtMap.get(w.highway);
     rt.numway++;
+    rt.numnode += w.nodeList.size();
     if (!rt.show) continue;
     strokeWeight(rt.w);  
     stroke(rt.c);
@@ -186,7 +187,7 @@ void drawText() {
     noStroke(); if (rt==currType) stroke(0);
     fill(rt.c); rect(x, y, rt.show ? 120 : 100, 15);
     String s = r == null ? "(null)" : r;
-    s = rt.numway + " - " + s;
+    s = rt.numway + " : " + rt.numnode + " - " + s;
     fill(0); text(s, x + 5, y + 12);
   }
 }
