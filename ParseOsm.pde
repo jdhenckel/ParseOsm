@@ -22,6 +22,7 @@ ArrayList<Way> wayList;
 HashMap<String,RoadType> rtMap; 
 RoadType currType;
 
+
 void setup() {
   size(1000, 800);
   loadFile("elgin-map.osm"); s=.22; px=4600; py=-1300;
@@ -44,18 +45,19 @@ void keyTyped() {
     case 'h': if (currType!=null) currType.show = !currType.show; break;
     case '?': case '/': showhelp = !showhelp; break;
     case 'o': writeFile(); break;
+    case 'i': readFile(); break;
     case 'c': setColor(); break;
-    case 'r': reduce(); break;
-    case 'R': for (int i=0;i<10;++i) reduce(); break;
+    case 'r': reduce(1e9); break;
+    case 'R': for (int i=0;i<50 && reduce(3000);++i) {} break;
   }
   //println("s "+s+" p "+px+", "+py);
 }
 
 
 
-void reduce() {
+boolean reduce(float maxarea) {
   // search all currType ways and see if any can be removed.
-  if (currType==null) return;
+  if (currType==null) return false;
   Way bestw = null;
   int besti = 0;
   float best = 0;
@@ -73,10 +75,15 @@ void reduce() {
       }
     }
   }
-  if (bestw != null) {
-    println("removed node "+besti+" with area "+.25*Math.sqrt(best));
-    bestw.nodeList.remove(besti);
-  }  
+  if (bestw == null) return false;
+  double area = .25*Math.sqrt(best);
+  if (area > maxarea) {
+    println("stop reduction, next area "+area);
+    return false;
+  }
+  println("removed node "+besti+" with area "+area);
+  bestw.nodeList.remove(besti);
+  return true;
 }
 
 boolean same(String q, String p) {
@@ -84,12 +91,26 @@ boolean same(String q, String p) {
   return q.equals(p);
 }
 
+
+void readFile() {
+}
+
 void writeFile() {
+  selectInput("Select a file to process:", "fileSelected");
+}
+
+void fileSelected(File selection) {
+  if (selection == null) {
+    println("Window was closed or the user hit cancel.");
+  } else {
+    loadFile(selection.getAbsolutePath()); s=.22; px=4600; py=-1300;
+    println("User selected " + selection.getAbsolutePath());
+  }
 }
 
 void setColor() {
   if (currType==null) return;
-  currType.cc = (currType.cc + 1) % 7;
+  currType.cc = (currType.cc + 1) % 8;
   if (currType.cc==0) currType.c = color(150);
   else if (currType.cc==1) currType.c = color(250,0,0);
   else if (currType.cc==2) currType.c = color(250,250,0);
@@ -105,7 +126,7 @@ void mouseMoved() {
   for (RoadType rt : rtMap.values()) {
     rt.hover = mouseY > rt.y && mouseY < rt.y + 18 && mouseX < 120;
     if (rt.hover) currType = rt;
-  }
+  }    
 }
 
 void draw() {
@@ -130,11 +151,32 @@ void draw() {
     strokeWeight(rt.w);  
     stroke(rt.c);
     for (Node n: w.nodeList) {
-      if (p != null) { line(p.x, p.y, n.x, n.y); p.numway++; }
-      n.numway++;
+      if (p != null) {
+        line(p.x, p.y, n.x, n.y); 
+        p.numway++; 
+        n.numway++;
+        if (!hide) {
+          PVector a = new PVector(p.x-n.x,p.y-n.y);
+          a.normalize().mult(1.5 * rt.w);
+          for (int i=1; i<w.lanes;++i)
+            line(p.x+a.y*i, p.y-a.x*i, n.x+a.y*i, n.y-a.x*i);
+          if (w.oneway) {
+            PVector m = new PVector(p.x+n.x,p.y+n.y).mult(.5);
+            strokeWeight(rt.w/5);
+            stroke(0);
+            PVector b = a.copy().mult(3).add(m);
+            line(m.x,m.y,b.x,b.y);
+            line(m.x+2*a.x+a.y,m.y+2*a.y-a.x,b.x,b.y);
+            line(m.x+2*a.x-a.y,m.y+2*a.y+a.x,b.x,b.y);
+            strokeWeight(rt.w);  
+            stroke(rt.c);
+          }
+        }
+      }      
       p = n;
     }
     if (!hide) {
+      
       //p = null;
       //for (Node n: w.nodeList) {
       //  if (p != null) 

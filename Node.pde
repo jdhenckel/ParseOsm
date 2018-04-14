@@ -30,4 +30,6 @@ class Node {
     return 4*A2*B2 - D*D;
     // this returns 4 times the square of the area
   }
+  
+  PVector pos() { return new PVector(x,y); }
 }

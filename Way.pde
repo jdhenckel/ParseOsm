@@ -6,7 +6,6 @@ class Way {
   String highway;
   int lanes;
   boolean oneway;
-  
   Way() {
     nodeList = new ArrayList<Node>();
   }
